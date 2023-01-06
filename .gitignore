@@ -1,0 +1,16 @@
+__pycache__/
+develop-eggs/
+dist/
+pip-wheel-metadata/
+*.egg-info/
+*.py[cod]
+*$py.class
+
+.DS_Store
+
+.pytest_cache/
+
+.idea/
+.vscode/
+
+resources/

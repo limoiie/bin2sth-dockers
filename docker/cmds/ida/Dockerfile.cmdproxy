@@ -1,0 +1,32 @@
+# escape=`
+
+ARG WINDOWS_TAG
+ARG CMDPROXY_TAG
+ARG IDA_TAG
+
+FROM cmdproxy.rs/windows-msvc:${CMDPROXY_TAG} as cmdproxy_builder
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+RUN $cmdproxy_path = $(Get-Command cmdproxy.exe).Source; `
+    Copy-Item -Path $cmdproxy_path -Destination C:\cmdproxy.exe
+
+FROM ida/win-${WINDOWS_TAG}:${IDA_TAG}
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+ENV USER_HOME=C:\\Users\\ContainerAdministrator
+ENV CMDPROXY_HOME=${USER_HOME}\\cmdproxy
+
+WORKDIR ${CMDPROXY_HOME}
+
+COPY --from=cmdproxy_builder C:\\cmdproxy.exe .\\
+COPY --from=cmdproxy_builder C:\\Windows\\System32\\vcruntime140.dll .\\
+COPY --from=cmdproxy_builder C:\\Windows\\System32\\vcruntime140_1.dll .\\
+
+RUN Write-Output $([string]::Format('ida: {0}\\idat64.exe', $env:IDA_HOME)) | `
+    Out-File -FilePath ${CMDPROXY_HOME}\command-palette.yaml
+
+ENV CMDPROXY_COMMAND_PALETTE=${CMDPROXY_HOME}\\command-palette.yaml
+
+ENTRYPOINT ["cmdproxy.exe"]
