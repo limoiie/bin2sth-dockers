@@ -25,7 +25,7 @@ COPY --from=cmdproxy_builder C:\Windows\System32\vcruntime140.dll .\
 COPY --from=cmdproxy_builder C:\Windows\System32\vcruntime140_1.dll .\
 
 RUN Write-Output $([string]::Format('ida: {0}\idat64.exe', $env:IDA_HOME)) | `
-    Out-File -FilePath $env:CMDPROXY_HOME\command-palette.yaml
+    Out-File -Encoding ascii -FilePath $env:CMDPROXY_HOME\command-palette.yaml
 
 ENV CMDPROXY_COMMAND_PALETTE=${CMDPROXY_HOME}\command-palette.yaml
 
