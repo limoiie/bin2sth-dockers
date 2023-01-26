@@ -1,0 +1,21 @@
+ARG CMDPROXY_TAG
+ARG UBUNTU_TAG
+ARG VCPKG_TAG
+
+FROM cmdproxy.rs:${CMDPROXY_TAG} AS cmdproxy_builder
+
+RUN cp `which cmdproxy` /
+
+FROM vcpkg/ubuntu-${UBUNTU_TAG}:${VCPKG_TAG}
+
+WORKDIR /home/cmdproxy
+
+# prepare configuration command-palette
+COPY --from=cmdproxy_builder /cmdproxy ./
+RUN echo "\n\
+vcpkg: /code/vcpkg/vcpkg" \
+    >> ./command-palette.yaml
+
+ENV CMDPROXY_COMMAND_PALETTE=/home/cmdproxy/command-palette.yaml
+
+ENTRYPOINT ["./cmdproxy"]

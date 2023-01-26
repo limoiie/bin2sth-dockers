@@ -97,6 +97,29 @@ class BuildHelper:
 
     @staticmethod
     @target_os('linux')
+    def vcpkg(ubuntu_tag: str, vcpkg_tag: str):
+        """
+        Build vcpkg image.
+
+        :param ubuntu_tag: Ubuntu tag, such as 18.04, 22.04, etc.
+        :param vcpkg_tag: Name of branch, tag, or commit of repo vcpkg.
+        """
+        Docker.Pull() \
+            .tag(f'ubuntu:{ubuntu_tag}') \
+            .run()
+
+        root = docker_root() / 'cmds' / 'vcpkg'
+        Docker.Build() \
+            .dockerfile(root / 'Dockerfile') \
+            .tag(f'vcpkg/ubuntu-{ubuntu_tag}:{vcpkg_tag}') \
+            .build_arg('UBUNTU_TAG', ubuntu_tag) \
+            .build_arg('VCPKG_TAG', vcpkg_tag) \
+            .enable_proxy_if_required() \
+            .context(root) \
+            .run()
+
+    @staticmethod
+    @target_os('linux')
     def bap(opam_tag: str, bap_version: str):
         """
         Build bap image.
@@ -163,6 +186,33 @@ class BuildHelper:
             .run()
 
     class Cmdproxy:
+        """
+        Provide many helper scripts for building cmdproxy-server-version
+        microservice images.
+        """
+
+        @staticmethod
+        @target_os('linux')
+        def vcpkg(ubuntu_tag: str, vcpkg_tag: str, cmdproxy_tag: str):
+            """
+            Build vcpkg image.
+    
+            :param ubuntu_tag: Ubuntu tag, such as 18.04, 22.04, etc.
+            :param vcpkg_tag: Name of branch, tag, or commit of repo vcpkg.
+            :param cmdproxy_tag: Cmdproxy.rs tag.
+            """
+            root = docker_root() / 'cmds' / 'vcpkg'
+            Docker.Build() \
+                .dockerfile(root / 'Dockerfile.cmdproxy') \
+                .tag(f'cmdproxy/vcpkg/ubuntu-{ubuntu_tag}:'
+                     f'cmdproxy-{cmdproxy_tag}-vcpkg-{vcpkg_tag}') \
+                .build_arg('UBUNTU_TAG', ubuntu_tag) \
+                .build_arg('VCPKG_TAG', vcpkg_tag) \
+                .build_arg('CMDPROXY_TAG', cmdproxy_tag) \
+                .enable_proxy_if_required() \
+                .context(root) \
+                .run()
+
         @staticmethod
         @target_os('linux')
         def bap(opam_tag: str, bap_version: str, cmdproxy_tag: str):
