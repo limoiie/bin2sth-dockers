@@ -7,6 +7,9 @@ from typing import Tuple, Union
 
 import fire
 
+ENABLE_PROXY = (os.getenv('ENABLE_PROXY') or '').lower() not in \
+               ('', '0', 'false', 'off', 'no', 'none')
+
 
 def docker_root() -> pathlib.Path:
     path = pathlib.Path(__file__)
@@ -67,6 +70,12 @@ class Docker:
             self.args.extend(['--build-arg', f'{key}={val}'])
             return self
 
+        def enable_proxy_if_required(self):
+            if ENABLE_PROXY:
+                self.build_arg('http_proxy', 'http://172.17.0.1:7890')
+                self.build_arg('https_proxy', 'http://172.17.0.1:7890')
+            return self
+
         def context(self, cwd: Union[str, os.PathLike] = '.'):
             self.args.append(cwd)
             return self
@@ -104,6 +113,7 @@ class BuildHelper:
             .tag(f'bap/{opam_tag}:{bap_version}') \
             .build_arg('OPAM_TAG', opam_tag) \
             .build_arg('BAP_VERSION', bap_version) \
+            .enable_proxy_if_required() \
             .context('.') \
             .run()
 
@@ -123,6 +133,7 @@ class BuildHelper:
             .tag(f'ida/win-{windows_tag.lower()}:{ida_version}') \
             .build_arg('IDA_DIR', ida_dir) \
             .build_arg('WINDOWS_TAG', windows_tag) \
+            .enable_proxy_if_required() \
             .context('.') \
             .run()
 
@@ -147,6 +158,7 @@ class BuildHelper:
             .build_arg('RUST_VERSION', rust_version) \
             .build_arg('VS_VERSION', vs_version) \
             .build_arg('WINDOWS_TAG', windows_tag) \
+            .enable_proxy_if_required() \
             .context('.') \
             .run()
 
@@ -169,6 +181,7 @@ class BuildHelper:
                 .build_arg('OPAM_TAG', opam_tag) \
                 .build_arg('BAP_VERSION', bap_version) \
                 .build_arg('CMDPROXY_TAG', cmdproxy_tag) \
+                .enable_proxy_if_required() \
                 .context('.') \
                 .run()
 
@@ -190,6 +203,7 @@ class BuildHelper:
                 .build_arg('WINDOWS_TAG', windows_tag.lower()) \
                 .build_arg('CMDPROXY_TAG', cmdproxy_tag) \
                 .build_arg('IDA_TAG', ida_version) \
+                .enable_proxy_if_required() \
                 .context('.') \
                 .run()
 
