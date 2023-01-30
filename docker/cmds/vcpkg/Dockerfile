@@ -3,6 +3,9 @@ ARG VCPKG_TAG
 
 FROM ubuntu:${UBUNTU_TAG}
 
+# Avoid interactive dialogue
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install necessary libraries
 RUN apt-get update -o Acquire::http::proxy=false && \
     apt-get install -y -o Acquire::http::proxy=false \
@@ -23,8 +26,7 @@ ARG VCPKG_TAG
 
 # Download, build and install vcpkg
 WORKDIR ${WORKSPACE}
-RUN git clone --depth 1 --branch ${VCPKG_TAG} --single-branch \
-    https://github.com/limoiie/vcpkg.git
+RUN git clone --branch ${VCPKG_TAG} https://github.com/limoiie/vcpkg.git
 WORKDIR ${VCPKG_ROOT}
 RUN ./bootstrap-vcpkg.sh && ./vcpkg integrate bash && \
     ./vcpkg register-compiler --c=$(which gcc) --cxx=$(which g++)
