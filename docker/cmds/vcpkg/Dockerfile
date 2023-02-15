@@ -50,7 +50,7 @@ ENV VCPKG_DEFAULT_TRIPLET=x64-linux-dynamic \
 COPY extra ${VCPKG_EXTRA_DIR}
 
 # Install build tools
-RUN apt-get install -y -o Acquire::http::proxy=false \
+RUN apt-get install -y \
     autoconf \
     autoconf-archive \
     bison \

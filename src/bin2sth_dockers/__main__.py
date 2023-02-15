@@ -101,8 +101,14 @@ class Docker:
 
         def enable_proxy_if_required(self):
             if ENABLE_PROXY:
-                self.build_arg('http_proxy', 'http://172.17.0.1:7890')
-                self.build_arg('https_proxy', 'http://172.17.0.1:7890')
+                if not ENABLE_PROXY.startswith('http') and \
+                        not ENABLE_PROXY.startswith('socket'):
+                    proxy = 'http://172.17.0.1:7890'
+                else:
+                    proxy = ENABLE_PROXY
+
+                self.build_arg('http_proxy', proxy)
+                self.build_arg('https_proxy', proxy)
             return self
 
         def context(self, cwd: Union[str, os.PathLike] = '.'):
