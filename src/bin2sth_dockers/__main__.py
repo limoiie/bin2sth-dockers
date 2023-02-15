@@ -8,9 +8,7 @@ from typing import Tuple, Union
 import fire
 
 DOCKER_REGISTRY = os.getenv('DOCKER_REGISTRY')
-
-ENABLE_PROXY = (os.getenv('ENABLE_PROXY') or '').lower() not in \
-               ('', '0', 'false', 'off', 'no', 'none')
+ENABLE_PROXY = os.getenv('ENABLE_PROXY')
 
 
 def docker_root(*parts) -> pathlib.Path:
@@ -100,7 +98,7 @@ class Docker:
             return self
 
         def enable_proxy_if_required(self):
-            if ENABLE_PROXY:
+            if (ENABLE_PROXY or '').lower() not in ('', 'off', 'false', '0'):
                 if not ENABLE_PROXY.startswith('http') and \
                         not ENABLE_PROXY.startswith('socket'):
                     proxy = 'http://172.17.0.1:7890'
