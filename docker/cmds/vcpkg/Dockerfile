@@ -14,6 +14,7 @@ RUN apt-get update -o Acquire::http::proxy=false && \
     curl \
     gcc \
     git \
+    ninja-build \
     pkg-config \
     python \
     unzip \
