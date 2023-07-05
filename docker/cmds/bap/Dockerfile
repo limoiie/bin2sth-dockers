@@ -1,4 +1,4 @@
-# clould be ubuntu-21.04, debian-11, etc.
+# could be ubuntu-21.04, debian-11, etc.
 ARG OPAM_TAG
 
 FROM ocaml/opam:${OPAM_TAG}

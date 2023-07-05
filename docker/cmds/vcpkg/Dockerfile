@@ -2,6 +2,7 @@ ARG UBUNTU_TAG=18.04
 ARG VCPKG_TAG
 
 FROM ubuntu:${UBUNTU_TAG}
+ARG VCPKG_TAG
 
 # Avoid interactive dialogue
 ENV DEBIAN_FRONTEND=noninteractive
@@ -23,7 +24,6 @@ RUN apt-get update -o Acquire::http::proxy=false && \
 # Configure vcpkg-compilation environment variables
 ENV WORKSPACE=/code
 ENV VCPKG_ROOT=${WORKSPACE}/vcpkg
-ARG VCPKG_TAG
 
 # Download, build and install vcpkg
 WORKDIR ${WORKSPACE}
