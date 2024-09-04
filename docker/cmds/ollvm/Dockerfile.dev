@@ -1,0 +1,36 @@
+ARG UBUNTU_TAG=18.04
+
+FROM ubuntu:${UBUNTU_TAG}
+
+# Avoid interactive dialogue
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install necessary libraries
+RUN apt-get update -o Acquire::http::proxy=false && \
+    apt-get install -y -o Acquire::http::proxy=false \
+    build-essential \
+    cmake \
+    curl \
+    gcc \
+    git \
+    pkg-config \
+    python \
+    unzip \
+    zip
+
+ENV WORKSPACE=/code
+ENV SRC_DIR=${WORKSPACE}/obfuscator \
+    BUILD_DIR=${WORKSPACE}/build \
+    INSTALL_DIR=${WORKSPACE}/installed
+
+# Configure and build ollvm
+COPY obfuscator ${SRC_DIR}
+
+WORKDIR ${BUILD_DIR}
+RUN cmake -DBUILD_SHARED_LIBS=on \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+    -DCMAKE_BUILD_TYPE=Release ${SRC_DIR} \
+    && make -j12
+
+WORKDIR ${WORKSPACE}
+ENTRYPOINT [ "/bin/bash" ]
